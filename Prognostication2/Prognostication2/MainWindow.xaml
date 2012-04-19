@@ -2,7 +2,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:wf="clr-namespace:ZedGraph;assembly=ZedGraph"
-        Title="MainWindow" Height="500" Width="660"
+        Title="MainWindow" Height="500" Width="673"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <TabControl Height="Auto" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="tabControl1" Width="Auto">
@@ -19,25 +19,35 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Гарантированная вероятность [Pгэ] [0; 1]" Height="28" HorizontalAlignment="Left" Margin="9,70,0,0" Name="label4" VerticalAlignment="Top" />
-                        <TextBox Height="23" HorizontalAlignment="Left" Margin="37,73,0,0" Name="PgTextBox" VerticalAlignment="Top" Width="60"/>
+                        <TextBox Height="23" Text="0,0" HorizontalAlignment="Left" Margin="37,73,0,0" Name="PgTextBox" VerticalAlignment="Top" Width="60"/>
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label Content="Количество деталей [N0]" Height="28" HorizontalAlignment="Left" Margin="10,100,0,0" Name="label5" VerticalAlignment="Top" />
                         <TextBox Height="23" HorizontalAlignment="Left" Margin="123,103,0,0" Name="N0TextBox" VerticalAlignment="Top" Width="60" />
                     </StackPanel>
-                    <DataGrid AutoGenerateColumns="False" Width="448" Height="Auto" MinHeight="280" HorizontalAlignment="Left" Margin="15,140,0,0" Name="dataGrid1" VerticalAlignment="Top" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Header="i" IsReadOnly="True" Width="220" Binding="{Binding Path=i, Mode=TwoWay}"/>
-                            <DataGridTextColumn Header="[ni]" Width="220" Binding="{Binding Path=ni, Mode=TwoWay}" IsReadOnly="False" />
-                        </DataGrid.Columns>
-                    </DataGrid>
+                    <StackPanel Orientation="Horizontal">
+                        <DataGrid AutoGenerateColumns="False" Width="448" Height="Auto" MinHeight="280" HorizontalAlignment="Left" Margin="15,140,0,0" Name="dataGrid1" VerticalAlignment="Top" CanUserAddRows="False" CanUserDeleteRows="False" CanUserSortColumns="False">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="i" IsReadOnly="True" Width="200" Binding="{Binding Path=i, Mode=TwoWay}"/>
+                                <DataGridTextColumn Header="[ni]" Width="200" Binding="{Binding Path=ni, Mode=TwoWay}" IsReadOnly="False" />
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <StackPanel Margin="10,140,0,0">
+                            <Label Content="Закон распределения:" Height="28" Name="label3" FontSize="15" />
+                            <RadioButton Content="Экспоненциальный" GroupName="Low" Height="16" Name="ExpRadioButton" ClickMode="Release" IsChecked="True"/>
+                            <RadioButton Content="Эрланга" GroupName="Low" Height="16" Name="ErlRadioButton" ClickMode="Release" />
+                            <RadioButton Content="Рэлея" GroupName="Low" Height="16" Name="RelRadioButton" ClickMode="Release" />
+                            <RadioButton Content="Вейбулла" GroupName="Low" Height="16" Name="VejbRadioButton" ClickMode="Release" />
+                            <RadioButton Content="Нормальный" GroupName="Low" Height="16" Name="NormRadioButton" ClickMode="Release" />
+                            <RadioButton Content="Усеченный нормальный" GroupName="Low" Height="16" Name="ShortNormRadioButton" ClickMode="Release" />
+                        </StackPanel>
+                    </StackPanel>
                 </Grid>
             </TabItem>
             <TabItem Header="Экспоненциальный" Name="ExpTabItem">
                 <Grid>
-                    <WindowsFormsHost Background="White" Name="ExpWFH">
-                        <wf:ZedGraphControl Name="ExpZedGraph">
-                        </wf:ZedGraphControl>
+                    <WindowsFormsHost Background="White" Name="ExpWFH" VerticalAlignment="Stretch" HorizontalAlignment="Stretch">
+                        <wf:ZedGraphControl Name="ExpZedGraph"></wf:ZedGraphControl>
                     </WindowsFormsHost>
                 </Grid>
             </TabItem>
@@ -83,60 +93,20 @@
             </TabItem>
             <TabItem Header="Итого" Name="FinalTabItem">
                 <Grid>
-                    <StackPanel Orientation="Vertical">
                         <StackPanel Orientation="Horizontal">
-                            <Grid Width="300" VerticalAlignment="Top"  HorizontalAlignment="Left">
-                                <StackPanel>
-                                    <Label Content="Экпоненциальное" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="ExpLabel" VerticalAlignment="Top" Foreground="Blue"/>
-                                    <Label Content="D11 = " Margin="10,0,0,0" Height="28" Name="D11Label" />
-                                    <Label Content="D12 = " Margin="10,0,0,0" Height="28" Name="D12Label" />
-                                    <Label Content="D13 = " Margin="10,0,0,0" Height="28" Name="D13Label" />
-                                </StackPanel>
-                            </Grid>
-                            <Grid Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                <StackPanel>
-                                    <Label Content="Эрланга" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="ErlLabel" VerticalAlignment="Top" Foreground="Blue"/>
-                                    <Label Content="D21 = " Margin="10,0,0,0" Height="28" Name="D21Label" />
-                                    <Label Content="D22 = " Margin="10,0,0,0" Height="28" Name="D22Label" />
-                                    <Label Content="D23 = " Margin="10,0,0,0" Height="28" Name="D23Label" />
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Grid Width="300" VerticalAlignment="Top"  HorizontalAlignment="Left">
-                                <StackPanel>
-                                    <Label Content="Рэлея" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="RelLabel" VerticalAlignment="Top" Foreground="Blue"/>
-                                    <Label Content="D31 = " Margin="10,0,0,0" Height="28" Name="D31Label" />
-                                    <Label Content="D32 = " Margin="10,0,0,0" Height="28" Name="D32Label" />
-                                    <Label Content="D33 = " Margin="10,0,0,0" Height="28" Name="D33Label" />
-                                    <Label Content="D34 = " Margin="10,0,0,0" Height="28" Name="D34Label" />
-                                </StackPanel>
-                            </Grid>
-                            <Grid Width="300" HorizontalAlignment="Left" VerticalAlignment="Top">
-                                <StackPanel>
-                                    <Label Content="Вейбулла" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="VejbLabel" VerticalAlignment="Top" Foreground="Blue"/>
-                                    <Label Content="D4 = " Margin="10,0,0,0" Height="28" Name="D4Label" />
-                                </StackPanel>
-                            </Grid>
-                        </StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <Grid Width="300" VerticalAlignment="Top"  HorizontalAlignment="Left">
-                                <StackPanel>
-                                    <Label Content="Нормальный" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="NormLabel" VerticalAlignment="Top" Foreground="Blue" />
-                                    <Label Content="D51 = " Margin="10,0,0,0" Height="28" Name="D51Label" />
-                                    <Label Content="D52 = " Margin="10,0,0,0" Height="28" Name="D52Label" />
-                                    <Label Content="D53 = " Margin="10,0,0,0" Height="28" Name="D53Label" />
-                                    <Label Content="D54 = " Margin="10,0,0,0" Height="28" Name="D54Label" />
-                                </StackPanel>
-                            </Grid>
-                            <Grid Width="300" VerticalAlignment="Top"  HorizontalAlignment="Left">
-                                <StackPanel>
-                                    <Label Content="Усеченный нормальный" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="ShortNormLabel" VerticalAlignment="Top" Foreground="Blue"/>
-                                    <Label Content="D6 = " Margin="10,0,0,0" Height="28" Name="D6Label" />
-                                    <Label Content="Ответ:" Margin="10,20,0,0" Height="28" Name="label3" Foreground="Red"/>
-                                    <Label Content="" Margin="10,0,0,0" Height="28" Name="AnswDLabel" Foreground="Red"/>
-                                </StackPanel>
-                            </Grid>
+                        <StackPanel>
+                            <Label Content="" Height="28" HorizontalAlignment="Left" Margin="10,10,0,0" Name="LowLabel" VerticalAlignment="Top" Foreground="Blue"/>
+                            <Label Content="" Height="28" Name="Inf1Label" />
+                            <Label Content="" Height="28" Name="Inf2Label" />
+                            <Label Content="" Height="28" Name="Inf3Label" />
+                            <Label Content="" Height="28" Name="Inf4Label" />
+                            <Label Content="" Height="28" Name="Inf5Label" />
+                            <Label Content="" Height="28" Name="Inf6Label" />
+                            <Label Content="" Height="28" Name="Inf7Label" />
+                            <Label Content="" Height="28" Name="Inf8Label" />
+                            <Label Content="" Height="28" Name="Inf9Label" />
+                            <Label Content="" Height="28" Name="Inf10Label" />
+                            <Label Content="" Height="28" Name="Inf11Label" />
                         </StackPanel>
                     </StackPanel>
                 </Grid>
