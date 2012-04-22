@@ -204,11 +204,11 @@ namespace Prognostication2
             // Обновляем график
             ExpZedGraph.Invalidate();
 
-            Inf1Label.Content = "aэ = " + a1.ToString();
-            Inf2Label.Content = "aэ* = " + a2.ToString();
-            Inf3Label.Content = "Tгэ = " + ((1.0 - Pg) / a1).ToString();
-            Inf4Label.Content = "Tоэ = " + (1.0 / a1).ToString();
-            Inf5Label.Content = "Qтэ = " + (1.0 / a1).ToString();
+            Inf1Label.Content = "a э = " + a1.ToString();
+            Inf2Label.Content = "a э* = " + a2.ToString();
+            Inf3Label.Content = "T гэ = " + ((1.0 - Pg) / a1).ToString();
+            Inf4Label.Content = "T оэ = " + (1.0 / a1).ToString();
+            Inf5Label.Content = "σ тэ = " + (1.0 / a1).ToString();
             //D[0] = CountDExp(a1);
             //D[1] = CountDExp(a2);
             //D[2] = CountDExp(a3);
@@ -250,11 +250,11 @@ sqr = Math.Sqrt(sqr)*/
             // Обновляем график
             ErlZedGraph.Invalidate();
 
-            Inf1Label.Content = "aэ = " + a1.ToString();
-            Inf2Label.Content = "aэ* = " + a2.ToString();
-            Inf3Label.Content = "Tгэ = " + (Math.Sqrt(1 - Pg) / a1).ToString();
-            Inf4Label.Content = "Tоэ = " + (2.0 / a1).ToString();
-            Inf5Label.Content = "Qтэ = " + (Math.Sqrt(2.0) / a1).ToString();
+            Inf1Label.Content = "a э = " + a1.ToString();
+            Inf2Label.Content = "a э* = " + a2.ToString();
+            Inf3Label.Content = "T гэ = " + (Math.Sqrt(1 - Pg) / a1).ToString();
+            Inf4Label.Content = "T оэ = " + (2.0 / a1).ToString();
+            Inf5Label.Content = "σ тэ = " + (Math.Sqrt(2.0) / a1).ToString();
 
             //D[3] = CountDErl(a1);
             //D[4] = CountDErl(a2);
@@ -295,15 +295,15 @@ sqr = Math.Sqrt(sqr)*/
             // Обновляем график
             RelZedGraph.Invalidate();
 
-            Inf1Label.Content = "aэ1 = " + a1.ToString();
-            Inf2Label.Content = "Tгэ1 = " + (Math.Sqrt((1.0 - Pg) / a1)).ToString();
-            Inf3Label.Content = "Tоэ1 = " + (Math.Sqrt(Math.PI / (4 * a1))).ToString();
-            Inf4Label.Content = "Qтэ1 = " + (Math.Sqrt((4.0 - Math.PI) / (4 * a1))).ToString();
-            Inf5Label.Content = "aэ2 = " + a2.ToString();
-            Inf6Label.Content = "Tгэ2 = " + (Math.Sqrt((1.0 - Pg) / a2)).ToString();
-            Inf7Label.Content = "Tоэ2 = " + (Math.Sqrt(Math.PI / (4 * a2))).ToString();
-            Inf8Label.Content = "Qтэ2 = " + (Math.Sqrt((4.0 - Math.PI) / (4 * a2))).ToString();
-            Inf9Label.Content = "aэ* = " + a3.ToString();
+            Inf1Label.Content = "a э1 = " + a1.ToString();
+            Inf2Label.Content = "T гэ1 = " + (Math.Sqrt((1.0 - Pg) / a1)).ToString();
+            Inf3Label.Content = "T оэ1 = " + (Math.Sqrt(Math.PI / (4 * a1))).ToString();
+            Inf4Label.Content = "σ тэ1 = " + (Math.Sqrt((4.0 - Math.PI) / (4 * a1))).ToString();
+            Inf5Label.Content = "a э2 = " + a2.ToString();
+            Inf6Label.Content = "T гэ2 = " + (Math.Sqrt((1.0 - Pg) / a2)).ToString();
+            Inf7Label.Content = "T оэ2 = " + (Math.Sqrt(Math.PI / (4 * a2))).ToString();
+            Inf8Label.Content = "σ тэ2 = " + (Math.Sqrt((4.0 - Math.PI) / (4 * a2))).ToString();
+            Inf9Label.Content = "a э* = " + a3.ToString();
             Inf10Label.Content = "D1 = " + CountDRel(a1).ToString();
             Inf11Label.Content = "D2 = " + CountDRel(a2).ToString();
             if (CountDRel(a1) < CountDRel(a2))
@@ -348,9 +348,17 @@ sqr = Math.Sqrt(sqr)*/
             // Обновляем график
             VejbZedGraph.Invalidate();
 
-            Inf1Label.Content = "aэ = " + A.ToString();
-            Inf2Label.Content = "Тгэ = " + (Math.Pow((1.0 - Pg) / A, (1.0 / B))).ToString();
-            //D[10] = CountDVejb(A, B);
+            double Tg = Math.Pow((1.0 - Pg) / A, (1.0 / B));
+
+            if (A.ToString() != "NaN")
+                Inf1Label.Content = "a э = " + A.ToString();
+            if (B.ToString() != "NaN")
+                Inf2Label.Content = "b э = " + B.ToString();
+            if (Tg.ToString() != "NaN")
+            {
+                Inf3Label.Content = "Т гэ = " + Tg.ToString();
+                Inf4Label.Content = "σ находится по фомулам 18, д-е.";
+            }
         }
 
         void DrawNormGraphics()
@@ -384,8 +392,15 @@ sqr = Math.Sqrt(sqr)*/
             NormZedGraph.AxisChange();
             // Обновляем график
             NormZedGraph.Invalidate();
-
-//            D[14] = CountDNorm(q4, T4);
+            if (T4.ToString() != "NaN")
+                Inf1Label.Content = "T нэ = " + T4.ToString();
+            if (q4.ToString() != "NaN")
+            {
+                Inf2Label.Content = "σ нэ = " + q4.ToString();
+                Inf3Label.Content = "T гэ находится по формуле 19, ж.";
+            }
+            if (q4.ToString() != "NaN")
+                Inf4Label.Content = "σ = " + q4.ToString();
         }
 
         void DrawShortNormGraphics()
@@ -420,6 +435,21 @@ sqr = Math.Sqrt(sqr)*/
             ShortNormZedGraph.AxisChange();
             // Обновляем график
             ShortNormZedGraph.Invalidate();
+
+            double k = C / Math.Sqrt(2 * Math.PI) * Math.Exp(T * T / (-2 * q * q));
+            double q1 = q * Math.Sqrt(1 - k * k + k * T / q);
+
+            if (T.ToString() != "NaN")
+                Inf1Label.Content = "T ун.э = " + T.ToString();
+            if (q.ToString() != "NaN")
+                Inf2Label.Content = "σ ун.э = " + q.ToString();
+            if (C.ToString() != "NaN")
+                Inf3Label.Content = "Cy = " + C.ToString();
+            if (q1.ToString() != "NaN")
+            {
+                Inf5Label.Content = "σ = " + q1.ToString();
+                Inf4Label.Content = "Tгэ находится по формуле 20, е.";
+            }
         }
 
         double FuncLowExp(double a, double t)
@@ -473,7 +503,7 @@ sqr = Math.Sqrt(sqr)*/
             }
             return result;
         }
-
+/*
         double CountDExp(double a)
         {
             Double D = 0;
@@ -498,10 +528,10 @@ sqr = Math.Sqrt(sqr)*/
             }
             D /= K;
             return D;
-        }
+        }*/
 
         double CountDRel(double a)
-        {
+        {/*
             Double D = 0;
             Double temp;
             for (int i = 1; i <= K; i++)
@@ -510,8 +540,18 @@ sqr = Math.Sqrt(sqr)*/
                 D += Math.Pow(temp, 2);
             }
             D /= K;
+            return D;*/
+            Double D = 0;
+            Double temp;
+            for (int i = 1; i <= K; i++)
+            {
+                temp = Math.Exp(-a * (i - 0.5) * dt * (i - 0.5) * dt) - 0.5 * (CountProbability(i - 2) + CountProbability(i - 1));
+                D += Math.Pow(temp, 2);
+            }
+            D /= K;
             return D;
         }
+        /*
 
         double CountDVejb(double a, double b)
         {
@@ -556,7 +596,7 @@ sqr = Math.Sqrt(sqr)*/
             }
             D /= K;
             return D;
-        }
+        }*/
 
         double Factorial(int x)
         {
