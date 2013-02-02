@@ -1,22 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace Prognostication2
+﻿namespace Prognostication2
 {
     class Results
     {
-        public int i { set; get; }
-        public int ni { set; get; }
-        public Results(int ii, int Ni)
+        public int I { set; get; }
+        public double Ni { set; get; }
+        
+        public Results(int i, double ni)
         {
-            i = ii;
-            ni = Ni;
+            I = i;
+            Ni = ni;
         }
-        public Results(int ii)
+        
+        public Results(int i)
         {
-            i = ii;
+            I = i;
         }
     }
 }

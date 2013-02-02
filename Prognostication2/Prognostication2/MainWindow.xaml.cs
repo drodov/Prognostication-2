@@ -1,16 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Collections.ObjectModel;
 using ZedGraph;
 
@@ -25,35 +16,36 @@ namespace Prognostication2
         Int32 K, N0;
         Double[] P;
         Double dt, Pg;
-        ObservableCollection<Results> ResCol = new ObservableCollection<Results>();
+        readonly ObservableCollection<Results> _resCol = new ObservableCollection<Results>();
+        
         public MainWindow()
         {
             InitializeComponent();
-            ZedGraphControl ExpZedGraph = ExpWFH.Child as ZedGraphControl;
-            ZedGraphControl ErlZedGraph = ErlWFH.Child as ZedGraphControl;
-            ZedGraphControl RelZedGraph = RelWFH.Child as ZedGraphControl;
-            ZedGraphControl VejbZedGraph = VejbWFH.Child as ZedGraphControl;
-            ZedGraphControl NormZedGraph = NormWFH.Child as ZedGraphControl;
-            ZedGraphControl ShortNormZedGraph = ShortNormWFH.Child as ZedGraphControl;
-            ExpZedGraph.GraphPane.Title.Text = "Экспоненциальный закон";
-            ExpZedGraph.GraphPane.XAxis.Title.Text = "t";
-            ExpZedGraph.GraphPane.YAxis.Title.Text = "P";
-            ErlZedGraph.GraphPane.Title.Text = "Закон Эрланга";
-            ErlZedGraph.GraphPane.XAxis.Title.Text = "t";
-            ErlZedGraph.GraphPane.YAxis.Title.Text = "P";
-            RelZedGraph.GraphPane.Title.Text = "Закон Рэлея";
-            RelZedGraph.GraphPane.XAxis.Title.Text = "t";
-            RelZedGraph.GraphPane.YAxis.Title.Text = "P";
-            VejbZedGraph.GraphPane.Title.Text = "Закон Вейбулла";
-            VejbZedGraph.GraphPane.XAxis.Title.Text = "t";
-            VejbZedGraph.GraphPane.YAxis.Title.Text = "P";
-            NormZedGraph.GraphPane.Title.Text = "Нормальный закон";
-            NormZedGraph.GraphPane.XAxis.Title.Text = "t";
-            NormZedGraph.GraphPane.YAxis.Title.Text = "P";
-            ShortNormZedGraph.GraphPane.Title.Text = "Усеченный нормальный закон";
-            ShortNormZedGraph.GraphPane.XAxis.Title.Text = "t";
-            ShortNormZedGraph.GraphPane.YAxis.Title.Text = "P";
-            dataGrid1.ItemsSource = ResCol;
+            var expZedGraph = (ZedGraphControl) ExpWFH.Child;
+            var erlZedGraph = (ZedGraphControl) ErlWFH.Child;
+            var relZedGraph = (ZedGraphControl) RelWFH.Child;
+            var vejbZedGraph = (ZedGraphControl) VejbWFH.Child;
+            var normZedGraph = (ZedGraphControl) NormWFH.Child;
+            var shortNormZedGraph = (ZedGraphControl) ShortNormWFH.Child;
+            expZedGraph.GraphPane.Title.Text = "Экспоненциальный закон";
+            expZedGraph.GraphPane.XAxis.Title.Text = "t";
+            expZedGraph.GraphPane.YAxis.Title.Text = "P";
+            erlZedGraph.GraphPane.Title.Text = "Закон Эрланга";
+            erlZedGraph.GraphPane.XAxis.Title.Text = "t";
+            erlZedGraph.GraphPane.YAxis.Title.Text = "P";
+            relZedGraph.GraphPane.Title.Text = "Закон Рэлея";
+            relZedGraph.GraphPane.XAxis.Title.Text = "t";
+            relZedGraph.GraphPane.YAxis.Title.Text = "P";
+            vejbZedGraph.GraphPane.Title.Text = "Закон Вейбулла";
+            vejbZedGraph.GraphPane.XAxis.Title.Text = "t";
+            vejbZedGraph.GraphPane.YAxis.Title.Text = "P";
+            normZedGraph.GraphPane.Title.Text = "Нормальный закон";
+            normZedGraph.GraphPane.XAxis.Title.Text = "t";
+            normZedGraph.GraphPane.YAxis.Title.Text = "P";
+            shortNormZedGraph.GraphPane.Title.Text = "Усеченный нормальный закон";
+            shortNormZedGraph.GraphPane.XAxis.Title.Text = "t";
+            shortNormZedGraph.GraphPane.YAxis.Title.Text = "P";
+            dataGrid1.ItemsSource = _resCol;
         }
 
         private void KTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -61,92 +53,162 @@ namespace Prognostication2
             Int32.TryParse(KTextBox.Text, out K);
             if ( K < 1 )
                 return;
-            ResCol.Clear();
+            _resCol.Clear();
             for (int i = 0; i < K; i++)
             {
-                ResCol.Add(new Results(i + 1));
+                _resCol.Add(new Results(i + 1));
             }
-            dataGrid1.ItemsSource = ResCol;
+            dataGrid1.ItemsSource = _resCol;
         }
 
         private void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            Clear();
-            Double.TryParse(dtTextBox.Text, out dt);
-            if (dt <= 0)
+            try
             {
-                MessageBox.Show("Неверно введено dt.");
-                return;
-            }
-            Double.TryParse(PgTextBox.Text, out Pg);
-            if (!(Pg >= 0 && Pg <= 1))
-            {
-                MessageBox.Show("Неверно введено Pg.");
-                return;
-            }
-            Int32.TryParse(N0TextBox.Text, out N0);
-            if (N0 <= 0)
-            {
-                MessageBox.Show("Неверно введено N0.");
-                return;
-            }
-            for (int i = 1; ; i *= 10 )
-            {
-                if ((int)dt / i == 0)
+                Clear();
+                Double.TryParse(dtTextBox.Text, out dt);
+                if (dt <= 0)
                 {
-                    DELTA *= i;
-                    break;
+                    MessageBox.Show("Неверно введено dt.");
+                    return;
                 }
+                Double.TryParse(PgTextBox.Text, out Pg);
+                if (!(Pg >= 0 && Pg <= 1))
+                {
+                    MessageBox.Show("Неверно введено Pg.");
+                    return;
+                }
+                Int32.TryParse(N0TextBox.Text, out N0);
+                if (N0 <= 0)
+                {
+                    MessageBox.Show("Неверно введено N0.");
+                    return;
+                }
+                double ni = 0;
+                for (int i = 0; i < _resCol.Count; i++)
+                {
+                    ni += _resCol[i].Ni;
+                }
+                if (ni != N0)
+                {
+                    MessageBox.Show("Сумма ni не равна N0.");
+                    return;
+                }
+                for (int i = 1; ; i *= 10)
+                {
+                    if ((int)dt / i == 0)
+                    {
+                        DELTA *= i;
+                        break;
+                    }
+                }
+                Int32.TryParse(KTextBox.Text, out K);
+                if (K < 1)
+                {
+                    MessageBox.Show("Неправильно указано число интервалов m.");
+                    return;
+                }
+                P = new Double[K];
+                for (int i = 0; i < K; i++)
+                {
+                    P[i] = CountProbability(i);
+                }
+                if (ExpRadioButton.IsChecked == true)
+                {
+                    LowLabel.Content = "Экпоненциальное";
+
+                    ExpTabItem.IsEnabled = true;
+                    ErlTabItem.IsEnabled = false;
+                    RelTabItem.IsEnabled = false;
+                    VejbTabItem.IsEnabled = false;
+                    NormTabItem.IsEnabled = false;
+                    ShortNormTabItem.IsEnabled = false;
+
+                    DrawExpGraphics();
+                }
+                else if (ErlRadioButton.IsChecked == true)
+                {
+                    LowLabel.Content = "Эрланга";
+
+                    ExpTabItem.IsEnabled = false;
+                    ErlTabItem.IsEnabled = true;
+                    RelTabItem.IsEnabled = false;
+                    VejbTabItem.IsEnabled = false;
+                    NormTabItem.IsEnabled = false;
+                    ShortNormTabItem.IsEnabled = false;
+
+                    DrawErlGraphics();
+                }
+                else if (RelRadioButton.IsChecked == true)
+                {
+                    LowLabel.Content = "Рэлея";
+
+                    ExpTabItem.IsEnabled = false;
+                    ErlTabItem.IsEnabled = false;
+                    RelTabItem.IsEnabled = true;
+                    VejbTabItem.IsEnabled = false;
+                    NormTabItem.IsEnabled = false;
+                    ShortNormTabItem.IsEnabled = false;
+
+                    DrawRelGraphics();
+                }
+                else if (VejbRadioButton.IsChecked == true)
+                {
+                    LowLabel.Content = "Вейбулла";
+
+                    ExpTabItem.IsEnabled = false;
+                    ErlTabItem.IsEnabled = false;
+                    RelTabItem.IsEnabled = false;
+                    VejbTabItem.IsEnabled = true;
+                    NormTabItem.IsEnabled = false;
+                    ShortNormTabItem.IsEnabled = false;
+
+                    DrawVejbGraphics();
+                }
+                else if (NormRadioButton.IsChecked == true)
+                {
+                    LowLabel.Content = "Нормальный";
+
+                    ExpTabItem.IsEnabled = false;
+                    ErlTabItem.IsEnabled = false;
+                    RelTabItem.IsEnabled = false;
+                    VejbTabItem.IsEnabled = false;
+                    NormTabItem.IsEnabled = true;
+                    ShortNormTabItem.IsEnabled = false;
+
+                    DrawNormGraphics();
+                }
+                else if (ShortNormRadioButton.IsChecked == true)
+                {
+                    LowLabel.Content = "Усеченный нормальный";
+
+                    ExpTabItem.IsEnabled = false;
+                    ErlTabItem.IsEnabled = false;
+                    RelTabItem.IsEnabled = false;
+                    VejbTabItem.IsEnabled = false;
+                    NormTabItem.IsEnabled = false;
+                    ShortNormTabItem.IsEnabled = true;
+
+                    DrawShortNormGraphics();
+                }
+                tabControl1.SelectedIndex = 7;
             }
-            Int32.TryParse(KTextBox.Text, out K);
-            if (K < 1)
-                return;
-            P = new Double[K];
-            for(int i = 0; i < K; i++)
+            catch (Exception ex)
             {
-                P[i] = CountProbability(i);
-            }
-            if (ExpRadioButton.IsChecked == true)
-            {
-                LowLabel.Content = "Экпоненциальное";
-                DrawExpGraphics();
-            }
-            else if (ErlRadioButton.IsChecked == true)
-            {
-                LowLabel.Content = "Эрланга";
-                DrawErlGraphics();
-            }
-            else if (RelRadioButton.IsChecked == true)
-            {
-                LowLabel.Content = "Рэлея";
-                DrawRelGraphics();
-            }
-            else if (VejbRadioButton.IsChecked == true)
-            {
-                LowLabel.Content = "Вейбулла";
-                DrawVejbGraphics();
-            }
-            else if (NormRadioButton.IsChecked == true)
-            {
-                LowLabel.Content = "Нормальный";
-                DrawNormGraphics();
-            }
-            else if (ShortNormRadioButton.IsChecked == true)
-            {
-                LowLabel.Content = "Усеченный нормальный";
-                DrawShortNormGraphics();
+                MessageBox.Show(ex.Message);
+                Clear();
             }
         }
 
-        int CountNi(int idx)
+        double CountNi(int idx)
         {
             idx--;
             if (idx < 0)
                 return N0;
-            int Ni = N0;
+            double Ni = N0;
             for (int i = 0; i < idx + 1; i++)
             {
-                Ni -= ResCol[i].ni;
+                Ni -= _resCol[i].Ni;
             }
             return Ni;
         }
@@ -155,7 +217,7 @@ namespace Prognostication2
         {
             int i1 = i;
             int i2 = i + 1;
-            return (double)(CountNi(i1) + CountNi(i2)) / (2.0 * N0);
+            return (CountNi(i1) + CountNi(i2)) / (2.0 * N0);
         }
 
         double CountLambda(int i)
@@ -164,45 +226,45 @@ namespace Prognostication2
                 return 0;
             int i1 = i;
             int i2 = i + 1;
-            return (double)(2.0 * ResCol[i].ni / (dt * (CountNi(i1) + CountNi(i2))));
+            return 2.0 * _resCol[i].Ni / (dt * (CountNi(i1) + CountNi(i2)));
         }
 
         double CountF(int i)
         {
             i--;
-            return ((double)ResCol[i].ni / (N0 * dt));
+            return _resCol[i].Ni / (N0 * dt);
         }
 
         void DrawExpGraphics()
         {
-            double t, a1 = 0, a2 = 0;
+            double a1 = 0, a2 = 0;
             for (int i = 0; i < K; i++)
             {
-                a1 += (double)ResCol[i].ni / (CountNi(i) + CountNi(i + 1));
+                a1 += _resCol[i].Ni / (CountNi(i) + CountNi(i + 1));
                 a2 += (1.0 - P[i]) / (i + 1);
             }
             a1 *= 2.0 / (K * dt);
             a2 *= 1.0 / (K * dt);
-            ZedGraphControl ExpZedGraph = ExpWFH.Child as ZedGraphControl;
-            GraphPane pane = ExpZedGraph.GraphPane;
+            var expZedGraph = (ZedGraphControl) ExpWFH.Child;
+            GraphPane pane = expZedGraph.GraphPane;
             pane.CurveList.Clear();
-            PointPairList list0 = new PointPairList();
-            PointPairList list1 = new PointPairList();
-            PointPairList list2 = new PointPairList();
+            var list0 = new PointPairList();
+            var list1 = new PointPairList();
+            var list2 = new PointPairList();
             // Заполняем список точек
             for (int i = 0; i < K; i++)
             {
-                t = (ResCol[i].i - 0.5) * dt;
+                double t = (_resCol[i].I - 0.5) * dt;
                 list0.Add(t, P[i]);
                 list1.Add(t, FuncLowExp(a1, t));
                 list2.Add(t, FuncLowExp(a2, t));
             }
-            LineItem Curve0 = pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
-            LineItem Curve1 = pane.AddCurve("aэ1", list1, System.Drawing.Color.Black, SymbolType.None);
-            LineItem Curve2 = pane.AddCurve("aэ*", list2, System.Drawing.Color.Green, SymbolType.None);
-            ExpZedGraph.AxisChange();
+            pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
+            pane.AddCurve("aэ1", list1, System.Drawing.Color.Black, SymbolType.None);
+            pane.AddCurve("aэ*", list2, System.Drawing.Color.Green, SymbolType.None);
+            expZedGraph.AxisChange();
             // Обновляем график
-            ExpZedGraph.Invalidate();
+            expZedGraph.Invalidate();
 
             Inf1Label.Content = "a э = " + a1.ToString();
             Inf2Label.Content = "a э* = " + a2.ToString();
@@ -216,39 +278,43 @@ namespace Prognostication2
 
         void DrawErlGraphics()
         {
-            double t, a1 = 0, a2 = 0, sqr;
+            double a1 = 0, a2 = 0, a3 = 0;
             for (int i = 0; i < K; i++)
             {
-                sqr = CountLambda(i) - CountLambda(i - 1);/*
-sqr = (CountLambda(i) - CountLambda(i - 1)) / dt;
-if (sqr < 0)
-    sqr *= -1;
-sqr = Math.Sqrt(sqr)*/
+                double sqr = CountLambda(i) - CountLambda(i - 1);
                 a1 += Math.Sqrt(sqr) / (1 - (i + 1 - 0.5) * Math.Sqrt(sqr * dt));
                 a2 += Math.Sqrt((1 - P[i]) / ((i + 1) * (i + 1)));
             }
             a1 /= (K * Math.Sqrt(dt));
             a2 /= (K * dt);
-            ZedGraphControl ErlZedGraph = ErlWFH.Child as ZedGraphControl;
-            GraphPane pane = ErlZedGraph.GraphPane;
+            for (int i = 0; i < K - 1; i++)
+            {
+                a3 += (CountLambda(i) / (i + 1 - 0.5) - (CountLambda(i + 1) - CountLambda(i))) / ((i + 1 + 0.5) * (CountLambda(i + 1) - CountLambda(i)));
+            }
+            a3 /= ((K - 1) * dt);
+            var erlZedGraph = (ZedGraphControl) ErlWFH.Child;
+            GraphPane pane = erlZedGraph.GraphPane;
             pane.CurveList.Clear();
-            PointPairList list0 = new PointPairList();
-            PointPairList list1 = new PointPairList();
-            PointPairList list2 = new PointPairList();
+            var list0 = new PointPairList();
+            var list1 = new PointPairList();
+            var list2 = new PointPairList();
+            var list3 = new PointPairList();
             // Заполняем список точек
             for (int i = 0; i < K; i++)
             {
-                t = (ResCol[i].i - 0.5) * dt;
+                double t = (_resCol[i].I - 0.5) * dt;
                 list0.Add(t, P[i]);
                 list1.Add(t, FuncLowErl(a1, t));
                 list2.Add(t, FuncLowErl(a2, t));
+                list3.Add(t, FuncLowErl(a3, t));
             }
-            LineItem Curve0 = pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
-            LineItem Curve1 = pane.AddCurve("aэ1", list1, System.Drawing.Color.Black, SymbolType.None);
-            LineItem Curve2 = pane.AddCurve("aэ*", list2, System.Drawing.Color.Green, SymbolType.None);
-            ErlZedGraph.AxisChange();
+            pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
+            pane.AddCurve("aэ1", list1, System.Drawing.Color.Black, SymbolType.None);
+            pane.AddCurve("aэ*", list2, System.Drawing.Color.Green, SymbolType.None);
+            pane.AddCurve("a2", list2, System.Drawing.Color.Blue, SymbolType.None);
+            erlZedGraph.AxisChange();
             // Обновляем график
-            ErlZedGraph.Invalidate();
+            erlZedGraph.Invalidate();
 
             Inf1Label.Content = "a э = " + a1.ToString();
             Inf2Label.Content = "a э* = " + a2.ToString();
@@ -262,38 +328,38 @@ sqr = Math.Sqrt(sqr)*/
 
         void DrawRelGraphics()
         {
-            double t, a1 = 0, a2 = 0, a3 = 0;
+            double a1 = 0, a3 = 0;
             for (int i = 0; i < K; i++)
             {
-                a1 += ResCol[i].ni * (i + 1 - 0.5) / (CountNi(i) + CountNi(i + 1));
+                a1 += _resCol[i].Ni * (i + 1 - 0.5) / (CountNi(i) + CountNi(i + 1));
                 a3 += (1.0 - P[i]) / ((i + 1) * (i + 1));
             }
             a1 *= 12 / (K * (4 * K * K - 1) * dt * dt);
-            a2 = (CountLambda(K - 1) - CountLambda(0)) / (2 * K * dt);
+            double a2 = (CountLambda(K - 1) - CountLambda(0)) / (2 * K * dt);
             a3 /= (K * dt * dt);
-            ZedGraphControl RelZedGraph = RelWFH.Child as ZedGraphControl;
-            GraphPane pane = RelZedGraph.GraphPane;
+            var relZedGraph = (ZedGraphControl) RelWFH.Child;
+            GraphPane pane = relZedGraph.GraphPane;
             pane.CurveList.Clear();
-            PointPairList list0 = new PointPairList();
-            PointPairList list1 = new PointPairList();
-            PointPairList list2 = new PointPairList();
-            PointPairList list3 = new PointPairList();
+            var list0 = new PointPairList();
+            var list1 = new PointPairList();
+            var list2 = new PointPairList();
+            var list3 = new PointPairList();
             // Заполняем список точек
             for (int i = 0; i < K; i++)
             {
-                t = (ResCol[i].i - 0.5) * dt;
+                double t = (_resCol[i].I - 0.5) * dt;
                 list0.Add(t, P[i]);
                 list1.Add(t, FuncLowRel(a1, t));
                 list2.Add(t, FuncLowRel(a2, t));
                 list3.Add(t, FuncLowRel(a3, t));
             }
-            LineItem Curve0 = pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
-            LineItem Curve1 = pane.AddCurve("aэ1", list1, System.Drawing.Color.Black, SymbolType.None);
-            LineItem Curve2 = pane.AddCurve("aэ2", list2, System.Drawing.Color.Green, SymbolType.None);
-            LineItem Curve3 = pane.AddCurve("aэ*", list3, System.Drawing.Color.Blue, SymbolType.None);
-            RelZedGraph.AxisChange();
+            pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
+            pane.AddCurve("aэ1", list1, System.Drawing.Color.Black, SymbolType.None);
+            pane.AddCurve("aэ2", list2, System.Drawing.Color.Green, SymbolType.None);
+            pane.AddCurve("aэ*", list3, System.Drawing.Color.Blue, SymbolType.None);
+            relZedGraph.AxisChange();
             // Обновляем график
-            RelZedGraph.Invalidate();
+            relZedGraph.Invalidate();
 
             Inf1Label.Content = "a э1 = " + a1.ToString();
             Inf2Label.Content = "T гэ1 = " + (Math.Sqrt((1.0 - Pg) / a1)).ToString();
@@ -317,137 +383,147 @@ sqr = Math.Sqrt(sqr)*/
 
         void DrawVejbGraphics()
         {
-            double t, x, y, a = 0, b = 0, c = 0, d = 0, e = 0;
+            double a = 0, b = 0, c = 0, e = 0;
             for (int i = 0; i < K; i++)
             {
-                a += Math.Log(CountLambda(i)); // i+1
+                a += Math.Log(CountLambda(i));
                 b += Math.Log(i + 1 - 0.5) + Math.Log(dt);
                 c += Math.Pow(Math.Log(i + 1 - 0.5) + Math.Log(dt), 2);
                 e += Math.Log(CountLambda(i)) * (Math.Log(i + 1 - 0.5) + Math.Log(dt));
             }
-            d = b * b;
-            x = (a  * c - b * e) / (K * c - b * b);
-            y = (a * b - K * e) / (b * b - K * c);
+            double x = (a  * c - b * e) / (K * c - b * b);
+            double y = (a * b - K * e) / (b * b - K * c);
             double B = 1 + y;
             double A = Math.Exp(x) / B;
-            ZedGraphControl VejbZedGraph = VejbWFH.Child as ZedGraphControl;
-            GraphPane pane = VejbZedGraph.GraphPane;
+            var vejbZedGraph = (ZedGraphControl) VejbWFH.Child;
+            GraphPane pane = vejbZedGraph.GraphPane;
             pane.CurveList.Clear();
-            PointPairList list0 = new PointPairList();
-            PointPairList list1 = new PointPairList();
+            var list0 = new PointPairList();
+            var list1 = new PointPairList();
             // Заполняем список точек
             for (int i = 0; i < K; i++)
             {
-                t = (ResCol[i].i - 0.5) * dt;
+                double t = (_resCol[i].I - 0.5) * dt;
                 list0.Add(t, P[i]);
                 list1.Add(t, FuncLowVejb(A, B, t));
             }//
-            LineItem Curve0 = pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
-            LineItem Curve1 = pane.AddCurve("a21", list1, System.Drawing.Color.Black, SymbolType.None);
-            VejbZedGraph.AxisChange();
+            pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
+            pane.AddCurve("a21", list1, System.Drawing.Color.Black, SymbolType.None);
+            vejbZedGraph.AxisChange();
             // Обновляем график
-            VejbZedGraph.Invalidate();
+            vejbZedGraph.Invalidate();
 
             double Tg = Math.Pow((1.0 - Pg) / A, (1.0 / B));
 
-            if (A.ToString() != "NaN")
+            if (!double.IsNaN(A))
+            {
                 Inf1Label.Content = "a э = " + A.ToString();
-            if (B.ToString() != "NaN")
+            }
+            if (!double.IsNaN(B))
+            {
                 Inf2Label.Content = "b э = " + B.ToString();
-            if (Tg.ToString() != "NaN")
+            }
+            if (!double.IsNaN(Tg))
             {
                 Inf3Label.Content = "Т гэ = " + Tg.ToString();
-                Inf4Label.Content = "σ находится по фомулам 18, д-е.";
+                Inf4Label.Content = "σ тэ находится по фомулам 18, д-е.";
             }
         }
 
         void DrawNormGraphics()
         {
-            double t, T4 = 0, q4 = 0, a, b = 0, g = 1, Y, X;
-            a = Math.Log(CountF(1) / CountF(K));
+            double b = 0, g = 1;
+            double a = Math.Log(CountF(1) / CountF(K));
             for (int i = 1; i <= K - 1; i++)
             {
                 b += Math.Pow(Math.Log(CountF(i) / CountF(i + 1)), 2);
                 g *= Math.Pow(CountF(i) / CountF(i + 1), i);
             }
             g = Math.Log(g);
-            Y = (double)(K - 1) * (0.5 * K * a - g) / (a * a - b * (K - 1));
-            X = (0.5 * K * b * (K - 1) - g * a) / (b * (K - 1) - a * a);
-            T4 = X * dt;
-            q4 = Math.Sqrt(Y ) * dt;
-            ZedGraphControl NormZedGraph = NormWFH.Child as ZedGraphControl;
-            GraphPane pane = NormZedGraph.GraphPane;
+            double Y = (K - 1) * (0.5 * K * a - g) / Math.Abs(a * a - b * (K - 1));
+            double X = (0.5 * K * b * (K - 1) - g * a) / (b * (K - 1) - a * a);
+            double T4 = X * dt;
+            double q4 = Math.Sqrt(Y ) * dt;
+            var normZedGraph = (ZedGraphControl) NormWFH.Child;
+            GraphPane pane = normZedGraph.GraphPane;
             pane.CurveList.Clear();
-            PointPairList list0 = new PointPairList();
-            PointPairList list4 = new PointPairList();
+            var list0 = new PointPairList();
+            var list4 = new PointPairList();
             // Заполняем список точек
             for (int i = 0; i < K; i++)
             {
-                t = (ResCol[i].i - 0.5) * dt;
+                double t = (_resCol[i].I - 0.5) * dt;
                 list0.Add(t, P[i]);
                 list4.Add(t, FuncLowNorm(T4, q4, t));
             }
-            LineItem Curve0 = pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
-            LineItem Curve4 = pane.AddCurve("a54", list4, System.Drawing.Color.Green, SymbolType.None);
-            NormZedGraph.AxisChange();
+            pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
+            pane.AddCurve("a54", list4, System.Drawing.Color.Green, SymbolType.None);
+            normZedGraph.AxisChange();
             // Обновляем график
-            NormZedGraph.Invalidate();
-            if (T4.ToString() != "NaN")
+            normZedGraph.Invalidate();
+            if (!double.IsNaN(T4))
+            {
                 Inf1Label.Content = "T нэ = " + T4.ToString();
-            if (q4.ToString() != "NaN")
+            }
+            if (!double.IsNaN(q4))
             {
                 Inf2Label.Content = "σ нэ = " + q4.ToString();
                 Inf3Label.Content = "T гэ находится по формуле 19, ж.";
+                Inf4Label.Content = "σ тэ = " + q4.ToString();
             }
-            if (q4.ToString() != "NaN")
-                Inf4Label.Content = "σ = " + q4.ToString();
         }
 
         void DrawShortNormGraphics()
         {
-            double t, C, T = 0, q = 0, a, b = 0, g = 1, Y, X;
-            a = Math.Log(CountF(1) / CountF(K));
+            double b = 0, g = 1;
+            double a = Math.Log(CountF(1) / CountF(K));
             for (int i = 1; i < K; i++)
             {
                 b += Math.Pow(Math.Log(CountF(i) / CountF(i + 1)), 2);
                 g *= Math.Pow(CountF(i) / CountF(i + 1), i);
             }
             g = Math.Log(g);
-            Y = (double)(K - 1) * (0.5 * K * a - g) / (a * a - b * (K - 1));
-            X = (0.5 * K * b * (K - 1) - g * a) / (b * (K - 1) - a * a);
-            T = X * dt;
-            q = Math.Sqrt(Y) * dt;
-            C = 1.0 / (0.5 + FLaplas(T / q));
-            ZedGraphControl ShortNormZedGraph = ShortNormWFH.Child as ZedGraphControl;
-            GraphPane pane = ShortNormZedGraph.GraphPane;
+            double Y = (K - 1) * (0.5 * K * a - g) / Math.Abs(a * a - b * (K - 1));
+            double X = (0.5 * K * b * (K - 1) - g * a) / (b * (K - 1) - a * a);
+            double T = X * dt;
+            double q = Math.Sqrt(Y) * dt;
+            double C = 1.0 / (0.5 + FLaplas(T / q));
+            var shortNormZedGraph = (ZedGraphControl) ShortNormWFH.Child;
+            GraphPane pane = shortNormZedGraph.GraphPane;
             pane.CurveList.Clear();
-            PointPairList list0 = new PointPairList();
-            PointPairList list1 = new PointPairList();
+            var list0 = new PointPairList();
+            var list1 = new PointPairList();
             // Заполняем список точек
             for (int i = 0; i < K; i++)
             {
-                t = (ResCol[i].i - 0.5) * dt;
+                double t = (_resCol[i].I - 0.5) * dt;
                 list0.Add(t, P[i]);
                 list1.Add(t, FuncLowShortNorm(T, q, t, C));
             }
-            LineItem Curve0 = pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
-            LineItem Curve1 = pane.AddCurve("a6", list1, System.Drawing.Color.Black, SymbolType.None);
-            ShortNormZedGraph.AxisChange();
+            pane.AddCurve("Экспериментально", list0, System.Drawing.Color.Red, SymbolType.None);
+            pane.AddCurve("a6", list1, System.Drawing.Color.Black, SymbolType.None);
+            shortNormZedGraph.AxisChange();
             // Обновляем график
-            ShortNormZedGraph.Invalidate();
+            shortNormZedGraph.Invalidate();
 
             double k = C / Math.Sqrt(2 * Math.PI) * Math.Exp(T * T / (-2 * q * q));
             double q1 = q * Math.Sqrt(1 - k * k + k * T / q);
 
-            if (T.ToString() != "NaN")
-                Inf1Label.Content = "T ун.э = " + T.ToString();
-            if (q.ToString() != "NaN")
-                Inf2Label.Content = "σ ун.э = " + q.ToString();
-            if (C.ToString() != "NaN")
-                Inf3Label.Content = "Cy = " + C.ToString();
-            if (q1.ToString() != "NaN")
+            if (!double.IsNaN(T))
             {
-                Inf5Label.Content = "σ = " + q1.ToString();
+                Inf1Label.Content = "T ун.э = " + T.ToString();
+            }
+            if (!double.IsNaN(q))
+            {
+                Inf2Label.Content = "σ ун.э = " + q.ToString();
+            }
+            if (!double.IsNaN(C))
+            {
+                Inf3Label.Content = "Cyэ = " + C.ToString();
+            }
+            if (!double.IsNaN(q1))
+            {
+                Inf5Label.Content = "σ тэ = " + q1.ToString();
                 Inf4Label.Content = "Tгэ находится по формуле 20, е.";
             }
         }
@@ -531,7 +607,8 @@ sqr = Math.Sqrt(sqr)*/
         }*/
 
         double CountDRel(double a)
-        {/*
+        {
+            /*
             Double D = 0;
             Double temp;
             for (int i = 1; i <= K; i++)
@@ -542,10 +619,9 @@ sqr = Math.Sqrt(sqr)*/
             D /= K;
             return D;*/
             Double D = 0;
-            Double temp;
             for (int i = 1; i <= K; i++)
             {
-                temp = Math.Exp(-a * (i - 0.5) * dt * (i - 0.5) * dt) - 0.5 * (CountProbability(i - 2) + CountProbability(i - 1));
+                Double temp = Math.Exp(-a * (i - 0.5) * dt * (i - 0.5) * dt) - 0.5 * (CountProbability(i - 2) + CountProbability(i - 1));
                 D += Math.Pow(temp, 2);
             }
             D /= K;
@@ -635,23 +711,23 @@ sqr = Math.Sqrt(sqr)*/
 
         void Clear()
         {
-            ZedGraphControl ExpZedGraph = ExpWFH.Child as ZedGraphControl;
-            ZedGraphControl ErlZedGraph = ErlWFH.Child as ZedGraphControl;
-            ZedGraphControl RelZedGraph = RelWFH.Child as ZedGraphControl;
-            ZedGraphControl VejbZedGraph = VejbWFH.Child as ZedGraphControl;
-            ZedGraphControl NormZedGraph = NormWFH.Child as ZedGraphControl;
-            ZedGraphControl ShortNormZedGraph = ShortNormWFH.Child as ZedGraphControl;
-            GraphPane pane = ExpZedGraph.GraphPane;
+            var expZedGraph = (ZedGraphControl) ExpWFH.Child;
+            var erlZedGraph = (ZedGraphControl) ErlWFH.Child;
+            var relZedGraph = (ZedGraphControl) RelWFH.Child;
+            var vejbZedGraph = (ZedGraphControl) VejbWFH.Child;
+            var normZedGraph = (ZedGraphControl) NormWFH.Child;
+            var shortNormZedGraph = (ZedGraphControl) ShortNormWFH.Child;
+            var pane = expZedGraph.GraphPane;
             pane.CurveList.Clear();
-            pane = ErlZedGraph.GraphPane;
+            pane = erlZedGraph.GraphPane;
             pane.CurveList.Clear();
-            pane = RelZedGraph.GraphPane;
+            pane = relZedGraph.GraphPane;
             pane.CurveList.Clear();
-            pane = VejbZedGraph.GraphPane;
+            pane = vejbZedGraph.GraphPane;
             pane.CurveList.Clear();
-            pane = NormZedGraph.GraphPane;
+            pane = normZedGraph.GraphPane;
             pane.CurveList.Clear();
-            pane = ShortNormZedGraph.GraphPane;
+            pane = shortNormZedGraph.GraphPane;
             pane.CurveList.Clear();
 
             LowLabel.Content = "";
