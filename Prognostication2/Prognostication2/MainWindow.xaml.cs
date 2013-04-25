@@ -12,39 +12,48 @@ namespace Prognostication2
     /// </summary>
     public partial class MainWindow : Window
     {
-        double DELTA = 0.0001;
-        Int32 K, N0;
-        Double[] P;
-        Double dt, Pg;
-        readonly ObservableCollection<Results> _resCol = new ObservableCollection<Results>();
+        private double DELTA;
+        private int K;
+        private int N0;
+        private double[] P;
+        private double dt;
+        private double Pg;
+        private readonly ObservableCollection<Results> _resCol = new ObservableCollection<Results>();
         
         public MainWindow()
         {
             InitializeComponent();
-            var expZedGraph = (ZedGraphControl) ExpWFH.Child;
-            var erlZedGraph = (ZedGraphControl) ErlWFH.Child;
-            var relZedGraph = (ZedGraphControl) RelWFH.Child;
-            var vejbZedGraph = (ZedGraphControl) VejbWFH.Child;
-            var normZedGraph = (ZedGraphControl) NormWFH.Child;
-            var shortNormZedGraph = (ZedGraphControl) ShortNormWFH.Child;
+
+            var expZedGraph = (ZedGraphControl)ExpWFH.Child;
             expZedGraph.GraphPane.Title.Text = "Экспоненциальный закон";
             expZedGraph.GraphPane.XAxis.Title.Text = "t";
             expZedGraph.GraphPane.YAxis.Title.Text = "P";
+
+            var erlZedGraph = (ZedGraphControl)ErlWFH.Child;
             erlZedGraph.GraphPane.Title.Text = "Закон Эрланга";
             erlZedGraph.GraphPane.XAxis.Title.Text = "t";
             erlZedGraph.GraphPane.YAxis.Title.Text = "P";
+
+            var relZedGraph = (ZedGraphControl)RelWFH.Child;
             relZedGraph.GraphPane.Title.Text = "Закон Рэлея";
             relZedGraph.GraphPane.XAxis.Title.Text = "t";
             relZedGraph.GraphPane.YAxis.Title.Text = "P";
+
+            var vejbZedGraph = (ZedGraphControl)VejbWFH.Child;
             vejbZedGraph.GraphPane.Title.Text = "Закон Вейбулла";
             vejbZedGraph.GraphPane.XAxis.Title.Text = "t";
             vejbZedGraph.GraphPane.YAxis.Title.Text = "P";
+
+            var normZedGraph = (ZedGraphControl)NormWFH.Child;
             normZedGraph.GraphPane.Title.Text = "Нормальный закон";
             normZedGraph.GraphPane.XAxis.Title.Text = "t";
             normZedGraph.GraphPane.YAxis.Title.Text = "P";
+
+            var shortNormZedGraph = (ZedGraphControl)ShortNormWFH.Child;
             shortNormZedGraph.GraphPane.Title.Text = "Усеченный нормальный закон";
             shortNormZedGraph.GraphPane.XAxis.Title.Text = "t";
             shortNormZedGraph.GraphPane.YAxis.Title.Text = "P";
+
             dataGrid1.ItemsSource = _resCol;
         }
 
@@ -66,24 +75,28 @@ namespace Prognostication2
             try
             {
                 Clear();
+
                 Double.TryParse(dtTextBox.Text, out dt);
                 if (dt <= 0)
                 {
                     MessageBox.Show("Неверно введено dt.");
                     return;
                 }
+
                 Double.TryParse(PgTextBox.Text, out Pg);
                 if (!(Pg >= 0 && Pg <= 1))
                 {
                     MessageBox.Show("Неверно введено Pg.");
                     return;
                 }
+
                 Int32.TryParse(N0TextBox.Text, out N0);
                 if (N0 <= 0)
                 {
                     MessageBox.Show("Неверно введено N0.");
                     return;
                 }
+
                 double ni = 0;
                 for (int i = 0; i < _resCol.Count; i++)
                 {
@@ -94,6 +107,8 @@ namespace Prognostication2
                     MessageBox.Show("Сумма ni не равна N0.");
                     return;
                 }
+
+                DELTA = 0.0001;
                 for (int i = 1; ; i *= 10)
                 {
                     if ((int)dt / i == 0)
@@ -102,17 +117,20 @@ namespace Prognostication2
                         break;
                     }
                 }
+
                 Int32.TryParse(KTextBox.Text, out K);
                 if (K < 1)
                 {
                     MessageBox.Show("Неправильно указано число интервалов m.");
                     return;
                 }
+
                 P = new Double[K];
                 for (int i = 0; i < K; i++)
                 {
                     P[i] = CountProbability(i);
                 }
+
                 if (ExpRadioButton.IsChecked == true)
                 {
                     LowLabel.Content = "Экпоненциальное";
@@ -200,7 +218,7 @@ namespace Prognostication2
             }
         }
 
-        double CountNi(int idx)
+        private double CountNi(int idx)
         {
             idx--;
             if (idx < 0)
@@ -213,14 +231,14 @@ namespace Prognostication2
             return Ni;
         }
 
-        double CountProbability(int i)
+        private double CountProbability(int i)
         {
             int i1 = i;
             int i2 = i + 1;
             return (CountNi(i1) + CountNi(i2)) / (2.0 * N0);
         }
 
-        double CountLambda(int i)
+        private double CountLambda(int i)
         {
             if (i < 0)
                 return 0;
@@ -229,13 +247,13 @@ namespace Prognostication2
             return 2.0 * _resCol[i].Ni / (dt * (CountNi(i1) + CountNi(i2)));
         }
 
-        double CountF(int i)
+        private double CountF(int i)
         {
             i--;
             return _resCol[i].Ni / (N0 * dt);
         }
 
-        void DrawExpGraphics()
+        private void DrawExpGraphics()
         {
             double a1 = 0, a2 = 0;
             for (int i = 0; i < K; i++)
@@ -276,7 +294,7 @@ namespace Prognostication2
             //D[2] = CountDExp(a3);
         }
 
-        void DrawErlGraphics()
+        private void DrawErlGraphics()
         {
             double a1 = 0, a2 = 0, a3 = 0;
             for (int i = 0; i < K; i++)
@@ -326,7 +344,7 @@ namespace Prognostication2
             //D[4] = CountDErl(a2);
         }
 
-        void DrawRelGraphics()
+        private void DrawRelGraphics()
         {
             double a1 = 0, a3 = 0;
             for (int i = 0; i < K; i++)
@@ -381,7 +399,7 @@ namespace Prognostication2
             //D[8] = CountDRel(a3);
         }
 
-        void DrawVejbGraphics()
+        private void DrawVejbGraphics()
         {
             double a = 0, b = 0, c = 0, e = 0;
             for (int i = 0; i < K; i++)
@@ -430,7 +448,7 @@ namespace Prognostication2
             }
         }
 
-        void DrawNormGraphics()
+        private void DrawNormGraphics()
         {
             double b = 0, g = 1;
             double a = Math.Log(CountF(1) / CountF(K));
@@ -473,7 +491,7 @@ namespace Prognostication2
             }
         }
 
-        void DrawShortNormGraphics()
+        private void DrawShortNormGraphics()
         {
             double b = 0, g = 1;
             double a = Math.Log(CountF(1) / CountF(K));
@@ -528,37 +546,37 @@ namespace Prognostication2
             }
         }
 
-        double FuncLowExp(double a, double t)
+        private double FuncLowExp(double a, double t)
         {
             return Math.Exp(-a * t);
         }
 
-        double FuncLowErl(double a, double t)
+        private double FuncLowErl(double a, double t)
         {
             return (1 + a * t) * Math.Exp(-a * t);
         }
 
-        double FuncLowRel(double a, double t)
+        private double FuncLowRel(double a, double t)
         {
             return Math.Exp(-a * t * t);
         }
 
-        double FuncLowVejb(double a, double b, double t)
+        private double FuncLowVejb(double a, double b, double t)
         {
             return Math.Exp(-a * Math.Pow(t, b));
         }
 
-        double FuncNorm(double T, double q, double t)
+        private double FuncNorm(double T, double q, double t)
         {
             return (1 / (q * Math.Sqrt(2 * Math.PI))) * Math.Exp(-Math.Pow(t - T, 2) / (2 * Math.Pow(q, 2)));
         }
 
-        double FuncLowNorm(double T, double q, double t)
+        private double FuncLowNorm(double T, double q, double t)
         {
             return 1 - IntegralForNorm(0, t, T, q);
         }
 
-        double FuncLowShortNorm(double T, double q, double t, double C)
+        private double FuncLowShortNorm(double T, double q, double t, double C)
         {
             return C * (1 - IntegralForNorm(0, t, T, q));
         }
@@ -569,7 +587,7 @@ namespace Prognostication2
             return res;
         }
 */
-        double IntegralForNorm(double lim1, double lim2, double T, double q)
+        private double IntegralForNorm(double lim1, double lim2, double T, double q)
         {
             double result = 0;
             double s = DELTA;
@@ -606,7 +624,7 @@ namespace Prognostication2
             return D;
         }*/
 
-        double CountDRel(double a)
+        private double CountDRel(double a)
         {
             /*
             Double D = 0;
@@ -674,7 +692,7 @@ namespace Prognostication2
             return D;
         }*/
 
-        double Factorial(int x)
+        private double Factorial(int x)
         {
             double y = 1;
             if (x == 0)
@@ -686,13 +704,13 @@ namespace Prognostication2
                 return y;
         }
 
-        double FLaplas(double x)
+        private double FLaplas(double x)
         {
             double res = 1.0 / Math.Sqrt(2 * Math.PI) * IntegralForLaplas(0, x, x);
             return res;
         }
 
-        double IntegralForLaplas(double lim1, double lim2, double x)
+        private double IntegralForLaplas(double lim1, double lim2, double x)
         {/*
             if (lim2 < 0)
             {
@@ -709,7 +727,7 @@ namespace Prognostication2
             return result;
         }
 
-        void Clear()
+        private void Clear()
         {
             var expZedGraph = (ZedGraphControl) ExpWFH.Child;
             var erlZedGraph = (ZedGraphControl) ErlWFH.Child;
